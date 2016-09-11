@@ -1,730 +1,578 @@
-#ifndef LPC21xx_H
-#define LPC21xx_H
-
-#define XTAL        (20000000UL)        /* Oscillator frequency               */
-
-/*******************************************************************************
-lpc21xx.h - Register defs for Philips LPC210X: LPC2104, LPC2105 and LPC2106
-
-           
-THE SOFTWARE IS DELIVERED "AS IS" WITHOUT WARRANTY OR CONDITION OF ANY KIND, 
-EITHER EXPRESS, IMPLIED OR STATUTORY. THIS INCLUDES WITHOUT LIMITATION ANY 
-WARRANTY OR CONDITION WITH RESPECT TO MERCHANTABILITY OR FITNESS FOR ANY 
-PARTICULAR PURPOSE, OR AGAINST THE INFRINGEMENTS OF INTELLECTUAL PROPERTY RIGHTS 
-OF OTHERS.
-           
-This file may be freely used for commercial and non-commercial applications, 
-including being redistributed with any tools.
-
-If you find a problem with the file, please report it so that it can be fixed.
-
-Created by Sten Larsson (sten_larsson at yahoo com)
-
-Edited by Richard Barry.
-
-Modified by Bruce Eisenhard, Mike Ray (at Coridium)
-*******************************************************************************/
-
-#define ARM7TDMI
-
-#define __ASM            __asm 
-  
-#define REG8  (volatile unsigned char*)
-#define REG16 (volatile unsigned short*)
-#define REG32 (volatile unsigned int*)
-
-
-/*##############################################################################
-## MISC
-##############################################################################*/
-
-        /* Constants for data to put in IRQ/FIQ Exception Vectors */
-#define VECTDATA_IRQ  0xE51FFFF0  /* LDR PC,[PC,#-0xFF0] */
-#define VECTDATA_FIQ  /* __TODO */
-
-
-/*##############################################################################
-## VECTORED INTERRUPT CONTROLLER
-##############################################################################*/
-
-#define VICIRQStatus    (*(REG32 (0xFFFFF000)))
-#define VICFIQStatus    (*(REG32 (0xFFFFF004)))
-#define VICRawIntr      (*(REG32 (0xFFFFF008)))
-#define VICIntSelect    (*(REG32 (0xFFFFF00C)))
-#define VICIntEnable    (*(REG32 (0xFFFFF010)))
-#define VICIntEnClear   (*(REG32 (0xFFFFF014)))
-#define VICSoftInt      (*(REG32 (0xFFFFF018)))
-#define VICSoftIntClear (*(REG32 (0xFFFFF01C)))
-#define VICProtection   (*(REG32 (0xFFFFF020)))
-#define VICVectAddr     (*(REG32 (0xFFFFF030)))
-#define VICDefVectAddr  (*(REG32 (0xFFFFF034)))
-
-#define VICVectAddr0    (*(REG32 (0xFFFFF100)))
-#define VICVectAddr1    (*(REG32 (0xFFFFF104)))
-#define VICVectAddr2    (*(REG32 (0xFFFFF108)))
-#define VICVectAddr3    (*(REG32 (0xFFFFF10C)))
-#define VICVectAddr4    (*(REG32 (0xFFFFF110)))
-#define VICVectAddr5    (*(REG32 (0xFFFFF114)))
-#define VICVectAddr6    (*(REG32 (0xFFFFF118)))
-#define VICVectAddr7    (*(REG32 (0xFFFFF11C)))
-#define VICVectAddr8    (*(REG32 (0xFFFFF120)))
-#define VICVectAddr9    (*(REG32 (0xFFFFF124)))
-#define VICVectAddr10   (*(REG32 (0xFFFFF128)))
-#define VICVectAddr11   (*(REG32 (0xFFFFF12C)))
-#define VICVectAddr12   (*(REG32 (0xFFFFF130)))
-#define VICVectAddr13   (*(REG32 (0xFFFFF134)))
-#define VICVectAddr14   (*(REG32 (0xFFFFF138)))
-#define VICVectAddr15   (*(REG32 (0xFFFFF13C)))
-
-#define VICVectCntl0    (*(REG32 (0xFFFFF200)))
-#define VICVectCntl1    (*(REG32 (0xFFFFF204)))
-#define VICVectCntl2    (*(REG32 (0xFFFFF208)))
-#define VICVectCntl3    (*(REG32 (0xFFFFF20C)))
-#define VICVectCntl4    (*(REG32 (0xFFFFF210)))
-#define VICVectCntl5    (*(REG32 (0xFFFFF214)))
-#define VICVectCntl6    (*(REG32 (0xFFFFF218)))
-#define VICVectCntl7    (*(REG32 (0xFFFFF21C)))
-#define VICVectCntl8    (*(REG32 (0xFFFFF220)))
-#define VICVectCntl9    (*(REG32 (0xFFFFF224)))
-#define VICVectCntl10   (*(REG32 (0xFFFFF228)))
-#define VICVectCntl11   (*(REG32 (0xFFFFF22C)))
-#define VICVectCntl12   (*(REG32 (0xFFFFF230)))
-#define VICVectCntl13   (*(REG32 (0xFFFFF234)))
-#define VICVectCntl14   (*(REG32 (0xFFFFF238)))
-#define VICVectCntl15   (*(REG32 (0xFFFFF23C)))
-
-#define VICITCR         (*(REG32 (0xFFFFF300)))
-#define VICITIP1        (*(REG32 (0xFFFFF304)))
-#define VICITIP2        (*(REG32 (0xFFFFF308)))
-#define VICITOP1        (*(REG32 (0xFFFFF30C)))
-#define VICITOP2        (*(REG32 (0xFFFFF310)))
-#define VICPeriphID0    (*(REG32 (0xFFFFFFE0)))
-#define VICPeriphID1    (*(REG32 (0xFFFFFFE4)))
-#define VICPeriphID2    (*(REG32 (0xFFFFFFE8)))
-#define VICPeriphID3    (*(REG32 (0xFFFFFFEC)))
-
-#define VICIntEnClr     VICIntEnClear
-#define VICSoftIntClr   VICSoftIntClear
-
-#define VIC_WDT         0
-#define VIC_TIMER0      4
-#define VIC_TIMER1      5
-#define VIC_UART0       6
-#define VIC_UART1       7
-#define VIC_PWM         8
-#define VIC_PWM0        8
-#define VIC_I2C         9
-#define VIC_SPI         10
-#define VIC_SPI0        10
-#define VIC_SPI1        11
-#define VIC_PLL         12
-#define VIC_RTC         13
-#define VIC_EINT0       14
-#define VIC_EINT1       15
-#define VIC_EINT2       16
-#define VIC_EINT3       17
-#define VIC_ADC         18
-
-// Vector Control Register bit definitions
-#define VIC_ENABLE      (1 << 5)
-
-
-
-/*##############################################################################
-## PCB - Pin Connect Block
-##############################################################################*/
-
-#define PCB_PINSEL0     (*(REG32 (0xE002C000)))
-#define PCB_PINSEL1     (*(REG32 (0xE002C004)))
-// LPC2138
-#define PCB_PINSEL2     (*(REG32 (0xE002C014)))
-
-
-/*##############################################################################
-## GPIO - General Purpose I/O
-##############################################################################*/
-
-  // high speed IOs
-#define SCB_SCS         (*(REG32 (0xE01FC1A0)))	// set to 1 to enable highspeed IOs
-
-#define GPIO_IOPIN      (*(REG32 (0x3FFFC014))) /* ALTERNATE NAME GPIO = GPIO0 */
-#define GPIO_IOSET      (*(REG32 (0x3FFFC018)))
-#define GPIO_IODIR      (*(REG32 (0x3FFFC000)))
-#define GPIO_IOCLR      (*(REG32 (0x3FFFC01C)))
-
-#define GPIO0_IOPIN     (*(REG32 (0x3FFFC014))) /* ALTERNATE NAME GPIO = GPIO0 */
-#define GPIO0_IOSET     (*(REG32 (0x3FFFC018)))
-#define GPIO0_IODIR     (*(REG32 (0x3FFFC000)))
-#define GPIO0_IOCLR     (*(REG32 (0x3FFFC01C)))
-#define GPIO0_IOMASK    (*(REG32 (0x3FFFC010)))
- 
-#define FIO0DIR		GPIO0_IODIR
-#define FIO1DIR		GPIO1_IODIR
-
-/*##############################################################################
-## UART0 / UART1
-##############################################################################*/
-
-/* ---- UART 0 --------------------------------------------- */
-#define UART0_RBR       (*(REG32 (0xE000C000)))
-#define UART0_THR       (*(REG32 (0xE000C000)))
-#define UART0_IER       (*(REG32 (0xE000C004)))
-#define UART0_IIR       (*(REG32 (0xE000C008)))
-#define UART0_FCR       (*(REG32 (0xE000C008)))
-#define UART0_LCR       (*(REG32 (0xE000C00C)))
-#define UART0_LSR       (*(REG32 (0xE000C014)))
-
-#define UART0_SCR       (*(REG32 (0xE000C01C)))
-#define UART0_ACR       (*(REG32 (0xE000C020)))
-#define UART0_DLL       (*(REG32 (0xE000C000)))
-#define UART0_DLM       (*(REG32 (0xE000C004)))
-#define UART0_FDR       (*(REG32 (0xE000C028)))
-#define UART0_TER       (*(REG32 (0xE000C030)))
-
-/* ---- UART 1 --------------------------------------------- */
-#define UART1_RBR       (*(REG32 (0xE0010000)))
-#define UART1_THR       (*(REG32 (0xE0010000)))
-#define UART1_IER       (*(REG32 (0xE0010004)))
-#define UART1_IIR       (*(REG32 (0xE0010008)))
-#define UART1_FCR       (*(REG32 (0xE0010008)))
-#define UART1_LCR       (*(REG32 (0xE001000C)))
-#define UART1_LSR       (*(REG32 (0xE0010014)))
-#define UART1_SCR       (*(REG32 (0xE001001C)))
-#define UART1_DLL       (*(REG32 (0xE0010000)))
-#define UART1_DLM       (*(REG32 (0xE0010004)))
-#define UART1_MCR       (*(REG32 (0xE0010010)))
-#define UART1_MSR       (*(REG32 (0xE0010018)))
-
-
-
-/*##############################################################################
-## I2C
-##############################################################################*/
-
-#define I2C_I2CONSET    (*(REG32 (0xE001C000)))
-#define I2C_I2STAT      (*(REG32 (0xE001C004)))
-#define I2C_I2DAT       (*(REG32 (0xE001C008)))
-#define I2C_I2ADR       (*(REG32 (0xE001C00C)))
-#define I2C_I2SCLH      (*(REG32 (0xE001C010)))
-#define I2C_I2SCLL      (*(REG32 (0xE001C014)))
-#define I2C_I2CONCLR    (*(REG32 (0xE001C018)))
-
-
-/*##############################################################################
-## SPI - Serial Peripheral Interface
-##############################################################################*/
-
-#define SPI_SPCR        (*(REG32 (0xE0020000)))
-#define SPI_SPSR        (*(REG32 (0xE0020004)))
-#define SPI_SPDR        (*(REG32 (0xE0020008)))
-#define SPI_SPCCR       (*(REG32 (0xE002000C)))
-#define SPI_SPTCR       (*(REG32 (0xE0020010)))
-#define SPI_SPTSR       (*(REG32 (0xE0020014)))
-#define SPI_SPTOR       (*(REG32 (0xE0020018)))
-#define SPI_SPINT       (*(REG32 (0xE002001C)))
-
-
-/*##############################################################################
-## Timer 0 and Timer 1
-##############################################################################*/
-
-/* ---- Timer 0 -------------------------------------------- */
-#define T0_IR           (*(REG32 (0xE0004000)))
-#define T0_TCR          (*(REG32 (0xE0004004)))
-#define T0_TC           (*(REG32 (0xE0004008)))
-#define T0_PR           (*(REG32 (0xE000400C)))
-#define T0_PC           (*(REG32 (0xE0004010)))
-#define T0_MCR          (*(REG32 (0xE0004014)))
-#define T0_MR0          (*(REG32 (0xE0004018)))
-#define T0_MR1          (*(REG32 (0xE000401C)))
-#define T0_MR2          (*(REG32 (0xE0004020)))
-#define T0_MR3          (*(REG32 (0xE0004024)))
-#define T0_CCR          (*(REG32 (0xE0004028)))
-#define T0_CR0          (*(REG32 (0xE000402C)))
-#define T0_CR1          (*(REG32 (0xE0004030)))
-#define T0_CR2          (*(REG32 (0xE0004034)))
-#define T0_CR3          (*(REG32 (0xE0004038)))
-#define T0_EMR          (*(REG32 (0xE000403C)))
-
-/* ---- Timer 1 -------------------------------------------- */
-#define T1_IR           (*(REG32 (0xE0008000)))
-#define T1_TCR          (*(REG32 (0xE0008004)))
-#define T1_TC           (*(REG32 (0xE0008008)))
-#define T1_PR           (*(REG32 (0xE000800C)))
-#define T1_PC           (*(REG32 (0xE0008010)))
-#define T1_MCR          (*(REG32 (0xE0008014)))
-#define T1_MR0          (*(REG32 (0xE0008018)))
-#define T1_MR1          (*(REG32 (0xE000801C)))
-#define T1_MR2          (*(REG32 (0xE0008020)))
-#define T1_MR3          (*(REG32 (0xE0008024)))
-#define T1_CCR          (*(REG32 (0xE0008028)))
-#define T1_CR0          (*(REG32 (0xE000802C)))
-#define T1_CR1          (*(REG32 (0xE0008030)))
-#define T1_CR2          (*(REG32 (0xE0008034)))
-#define T1_CR3          (*(REG32 (0xE0008038)))
-#define T1_EMR          (*(REG32 (0xE000803C)))
-
-//  CPU TYPE == 2103  #if (defined ARM-mite) || (defined ARMexp-LITE)
-#define PWM0CON       	(*(REG32 (0xE0004074)))
-#define PWM1CON       	(*(REG32 (0xE0008074)))
-#define PWM2CON       	(*(REG32 (0xE0070074)))
-#define PWM3CON       	(*(REG32 (0xE0074074)))
-
-
-/* ---- Timer 2 -------------------------------------------- */
-#define T2_IR           (*(REG32 (0xE0070000)))
-#define T2_TCR          (*(REG32 (0xE0070004)))
-#define T2_TC           (*(REG32 (0xE0070008)))
-#define T2_PR           (*(REG32 (0xE007000C)))
-#define T2_PC           (*(REG32 (0xE0070010)))
-#define T2_MCR          (*(REG32 (0xE0070014)))
-#define T2_MR0          (*(REG32 (0xE0070018)))
-#define T2_MR1          (*(REG32 (0xE007001C)))
-#define T2_MR2          (*(REG32 (0xE0070020)))
-#define T2_MR3          (*(REG32 (0xE0070024)))
-#define T2_CCR          (*(REG32 (0xE0070028)))
-#define T2_CR0          (*(REG32 (0xE007002C)))
-#define T2_CR1          (*(REG32 (0xE0070030)))
-#define T2_CR2          (*(REG32 (0xE0070034)))
-#define T2_CR3          (*(REG32 (0xE0070038)))
-#define T2_EMR          (*(REG32 (0xE007003C)))
-
-/* ---- Timer 3 -------------------------------------------- */
-#define T3_IR           (*(REG32 (0xE0074000)))
-#define T3_TCR          (*(REG32 (0xE0074004)))
-#define T3_TC           (*(REG32 (0xE0074008)))
-#define T3_PR           (*(REG32 (0xE007400C)))
-#define T3_PC           (*(REG32 (0xE0074010)))
-#define T3_MCR          (*(REG32 (0xE0074014)))
-#define T3_MR0          (*(REG32 (0xE0074018)))
-#define T3_MR1          (*(REG32 (0xE007401C)))
-#define T3_MR2          (*(REG32 (0xE0074020)))
-#define T3_MR3          (*(REG32 (0xE0074024)))
-#define T3_CCR          (*(REG32 (0xE0074028)))
-#define T3_CR0          (*(REG32 (0xE007402C)))
-#define T3_CR1          (*(REG32 (0xE0074030)))
-#define T3_CR2          (*(REG32 (0xE0074034)))
-#define T3_CR3          (*(REG32 (0xE0074038)))
-#define T3_EMR          (*(REG32 (0xE007403C)))
-//#endif
-
-
-/*##############################################################################
-## PWM
-##############################################################################*/
-
-#define PWM_IR          (*(REG32 (0xE0014000)))
-#define PWM_TCR         (*(REG32 (0xE0014004)))
-#define PWM_TC          (*(REG32 (0xE0014008)))
-#define PWM_PR          (*(REG32 (0xE001400C)))
-#define PWM_PC          (*(REG32 (0xE0014010)))
-#define PWM_MCR         (*(REG32 (0xE0014014)))
-#define PWM_MR0         (*(REG32 (0xE0014018)))
-#define PWM_MR1         (*(REG32 (0xE001401C)))
-#define PWM_MR2         (*(REG32 (0xE0014020)))
-#define PWM_MR3         (*(REG32 (0xE0014024)))
-#define PWM_MR4         (*(REG32 (0xE0014040)))
-#define PWM_MR5         (*(REG32 (0xE0014044)))
-#define PWM_MR6         (*(REG32 (0xE0014048)))
-#define PWM_EMR         (*(REG32 (0xE001403C)))
-#define PWM_PCR         (*(REG32 (0xE001404C)))
-#define PWM_LER         (*(REG32 (0xE0014050)))
-#define PWM_CCR         (*(REG32 (0xE0014028)))
-#define PWM_CR0         (*(REG32 (0xE001402C)))
-#define PWM_CR1         (*(REG32 (0xE0014030)))
-#define PWM_CR2         (*(REG32 (0xE0014034)))
-#define PWM_CR3         (*(REG32 (0xE0014038)))
-
-/*##############################################################################
-## RTC
-##############################################################################*/
-
-/* ---- RTC: Miscellaneous Register Group ------------------ */
-#define RTC_ILR         (*(REG32 (0xE0024000)))
-#define RTC_CTC         (*(REG32 (0xE0024004)))
-#define RTC_CCR         (*(REG32 (0xE0024008)))  
-#define RTC_CIIR        (*(REG32 (0xE002400C)))
-#define RTC_AMR         (*(REG32 (0xE0024010)))
-#define RTC_CTIME0      (*(REG32 (0xE0024014)))
-#define RTC_CTIME1      (*(REG32 (0xE0024018)))
-#define RTC_CTIME2      (*(REG32 (0xE002401C)))
-
-/* ---- RTC: Timer Control Group --------------------------- */
-#define RTC_SEC         (*(REG32 (0xE0024020)))
-#define RTC_MIN         (*(REG32 (0xE0024024)))
-#define RTC_HOUR        (*(REG32 (0xE0024028)))
-#define RTC_DAY         (*(REG32 (0xE002402C)))
-#define RTC_DOW         (*(REG32 (0xE0024030)))
-#define RTC_DOY         (*(REG32 (0xE0024034)))
-#define RTC_MONTH       (*(REG32 (0xE0024038)))
-#define RTC_YEAR        (*(REG32 (0xE002403C)))
-
-/* ---- RTC: Alarm Control Group --------------------------- */
-#define RTC_ALSEC       (*(REG32 (0xE0024060)))
-#define RTC_ALMIN       (*(REG32 (0xE0024064)))
-#define RTC_ALHOUR      (*(REG32 (0xE0024068)))
-#define RTC_ALDAY       (*(REG32 (0xE002406C)))
-#define RTC_ALDOW       (*(REG32 (0xE0024070)))
-#define RTC_ALDOY       (*(REG32 (0xE0024074)))
-#define RTC_ALMONTH     (*(REG32 (0xE0024078)))
-#define RTC_ALYEAR      (*(REG32 (0xE002407C)))
-
-/* ---- RTC: Reference Clock Divider Group ----------------- */
-#define RTC_PREINT      (*(REG32 (0xE0024080)))
-#define RTC_PREFRAC     (*(REG32 (0xE0024084)))
-
-
-/*##############################################################################
-## WD - Watchdog
-##############################################################################*/
-
-#define WD_WDMOD        (*(REG32 (0xE0000000)))
-#define WD_WDTC         (*(REG32 (0xE0000004)))
-#define WD_WDFEED       (*(REG32 (0xE0000008)))
-#define WD_WDTV         (*(REG32 (0xE000000C)))
-
-
-/*##############################################################################
-## System Control Block
-##############################################################################*/
-
-#define SCB_MEMMAP      (*(REG32 (0xE01FC040)))
-#define SCB_PLLCON      (*(REG32 (0xE01FC080)))
-#define SCB_PLLCFG      (*(REG32 (0xE01FC084)))
-#define SCB_PLLSTAT     (*(REG32 (0xE01FC088)))
-#define SCB_PLLFEED     (*(REG32 (0xE01FC08C)))
-#define SCB_PCON        (*(REG32 (0xE01FC0C0)))
-#define SCB_PCONP       (*(REG32 (0xE01FC0C4)))
-#define SCB_APBDIV      (*(REG32 (0xE01FC100)))
-#define SCB_EXTINT      (*(REG32 (0xE01FC140)))
-#define SCB_EXTWAKE     (*(REG32 (0xE01FC144)))
-#define SCB_EXTMODE     (*(REG32 (0xE01FC148)))
-#define SCB_EXTPOLAR    (*(REG32 (0xE01FC14C)))
-#define SCB_RSIR	    (*(REG32 (0xE01FC180)))
-
-// PLLCON Register Bit Definitions
-#define PLLCON_PLLE   (1 << 0)          // PLL Enable
-#define PLLCON_PLLC   (1 << 1)          // PLL Connect
-
-
-
-/*##############################################################################
-## Memory Accelerator Module (MAM)
-##############################################################################*/
-
-#define MAM_TIM			(*(REG32 (0xE01FC004)))
-#define MAM_CR			(*(REG32 (0xE01FC000)))
-
-// MAM defines
-#define MAMCR_FULL    2
-
-// MEMMAP defines
-#define MEMMAP_FLASH  1                 // Interrupt Vectors in Flash
-
-#define MAMTIM_CYCLES 	(((__CORE_CLK) + 19999999) / 20000000)
-
-
-/*##############################################################################
-## A/D controller (2103)
-##############################################################################*/
-
-#define AD_ADCR			(*(REG32 (0xE0034000)))
-#define AD_ADGDR		(*(REG32 (0xE0034004)))
-#define AD_ADSTAT		(*(REG32 (0xE0034030)))
-#define AD_ADINTEN		(*(REG32 (0xE003400C)))
-#define AD_ADDR0		(*(REG32 (0xE0034010)))
-#define AD_ADDR1		(*(REG32 (0xE0034014)))
-#define AD_ADDR2		(*(REG32 (0xE0034018)))
-#define AD_ADDR3		(*(REG32 (0xE003401C)))
-#define AD_ADDR4		(*(REG32 (0xE0034020)))
-#define AD_ADDR5		(*(REG32 (0xE0034024)))
-#define AD_ADDR6		(*(REG32 (0xE0034028)))
-#define AD_ADDR7		(*(REG32 (0xE003402C)))
-
-///////////////////////////////////////////////////// CMSIS definitions ////////////////////////////////////////////////////
-
-#ifndef GCC_ASM_STEP
-
-#include <stdint.h>                      /*!< standard types definitions                      */
-
-
-/* IO definitions (access restrictions to peripheral registers) */
-#ifdef __cplusplus
-  #define   __I     volatile             /*!< defines 'read only' permissions                 */
-#else
-  #define   __I     volatile const       /*!< defines 'read only' permissions                 */
+// Processor register mappings for Philips LPC2103. Should also work fine
+// for LPC2102 and LPC2101.
+//
+// Copyright (c) 2006, K9spud LLC.
+// http://www.k9spud.com/arm/lpc2103/
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+//
+// As a special exception, if other files instantiate templates or
+// use macros or inline functions from this file, or you compile this
+// file and link it with other works to produce a work based on this file,
+// this file does not by itself cause the resulting work to be covered
+// by the GNU General Public License. However the source code for this
+// file must still be made available in accordance with section (3) of
+// the GNU General Public License.
+//
+// This exception does not invalidate any other reasons why a work based
+// on this file might be covered by the GNU General Public License.
+//
+// $Log: lpc2103.h,v $
+// Revision 1.1  2006/04/13 06:31:38  edwards
+// Initial revision.
+//
+
+#ifndef __LPC2103_H__
+#define __LPC2103_H__
+
+#define BIT0 (1<<0)
+#define BIT1 (1<<1)
+#define BIT2 (1<<2)
+#define BIT3 (1<<3)
+#define BIT4 (1<<4)
+#define BIT5 (1<<5)
+#define BIT6 (1<<6)
+#define BIT7 (1<<7)
+
+#define BIT8 (1<<8)
+#define BIT9 (1<<9)
+#define BIT10 (1<<10)
+#define BIT11 (1<<11)
+#define BIT12 (1<<12)
+#define BIT13 (1<<13)
+#define BIT14 (1<<14)
+#define BIT15 (1<<15)
+
+#define BIT16 (1<<16)
+#define BIT17 (1<<17)
+#define BIT18 (1<<18)
+#define BIT19 (1<<19)
+#define BIT20 (1<<20)
+#define BIT21 (1<<21)
+#define BIT22 (1<<22)
+#define BIT23 (1<<23)
+
+#define BIT24 (1<<24)
+#define BIT25 (1<<25)
+#define BIT26 (1<<26)
+#define BIT27 (1<<27)
+#define BIT28 (1<<28)
+#define BIT29 (1<<29)
+#define BIT30 (1<<30)
+#define BIT31 (1<<31)
+
+typedef volatile unsigned char  LPC_REG8  __attribute__ ((aligned (4)));
+typedef volatile unsigned short LPC_REG16 __attribute__ ((aligned (4)));
+typedef volatile unsigned long  LPC_REG32 __attribute__ ((aligned (4)));
+
+/* Vectored Interrupt Controller (VIC) */
+#define VICIRQStatus	(*((volatile unsigned long *) 0xFFFFF000))
+#define VICFIQStatus	(*((volatile unsigned long *) 0xFFFFF004))
+#define VICRawIntr	(*((volatile unsigned long *) 0xFFFFF008))
+#define VICIntSelect	(*((volatile unsigned long *) 0xFFFFF00C))
+#define VICIntEnable	(*((volatile unsigned long *) 0xFFFFF010))
+#define VICIntEnClr	(*((volatile unsigned long *) 0xFFFFF014))
+#define VICSoftInt	(*((volatile unsigned long *) 0xFFFFF018))
+#define VICSoftIntClr	(*((volatile unsigned long *) 0xFFFFF01C))
+#define VICProtection	(*((volatile unsigned long *) 0xFFFFF020))
+#define VICVectAddr	(*((volatile unsigned long *) 0xFFFFF030))
+#define VICDefVectAddr	(*((volatile unsigned long *) 0xFFFFF034))
+#define VICVectAddr0	(*((volatile unsigned long *) 0xFFFFF100))
+#define VICVectAddr1	(*((volatile unsigned long *) 0xFFFFF104))
+#define VICVectAddr2	(*((volatile unsigned long *) 0xFFFFF108))
+#define VICVectAddr3	(*((volatile unsigned long *) 0xFFFFF10C))
+#define VICVectAddr4	(*((volatile unsigned long *) 0xFFFFF110))
+#define VICVectAddr5	(*((volatile unsigned long *) 0xFFFFF114))
+#define VICVectAddr6	(*((volatile unsigned long *) 0xFFFFF118))
+#define VICVectAddr7	(*((volatile unsigned long *) 0xFFFFF11C))
+#define VICVectAddr8	(*((volatile unsigned long *) 0xFFFFF120))
+#define VICVectAddr9	(*((volatile unsigned long *) 0xFFFFF124))
+#define VICVectAddr10	(*((volatile unsigned long *) 0xFFFFF128))
+#define VICVectAddr11	(*((volatile unsigned long *) 0xFFFFF12C))
+#define VICVectAddr12	(*((volatile unsigned long *) 0xFFFFF130))
+#define VICVectAddr13	(*((volatile unsigned long *) 0xFFFFF134))
+#define VICVectAddr14	(*((volatile unsigned long *) 0xFFFFF138))
+#define VICVectAddr15	(*((volatile unsigned long *) 0xFFFFF13C))
+#define VICVectCntl0	(*((volatile unsigned long *) 0xFFFFF200))
+#define VICVectCntl1	(*((volatile unsigned long *) 0xFFFFF204))
+#define VICVectCntl2	(*((volatile unsigned long *) 0xFFFFF208))
+#define VICVectCntl3	(*((volatile unsigned long *) 0xFFFFF20C))
+#define VICVectCntl4	(*((volatile unsigned long *) 0xFFFFF210))
+#define VICVectCntl5	(*((volatile unsigned long *) 0xFFFFF214))
+#define VICVectCntl6	(*((volatile unsigned long *) 0xFFFFF218))
+#define VICVectCntl7	(*((volatile unsigned long *) 0xFFFFF21C))
+#define VICVectCntl8	(*((volatile unsigned long *) 0xFFFFF220))
+#define VICVectCntl9	(*((volatile unsigned long *) 0xFFFFF224))
+#define VICVectCntl10	(*((volatile unsigned long *) 0xFFFFF228))
+#define VICVectCntl11	(*((volatile unsigned long *) 0xFFFFF22C))
+#define VICVectCntl12	(*((volatile unsigned long *) 0xFFFFF230))
+#define VICVectCntl13	(*((volatile unsigned long *) 0xFFFFF234))
+#define VICVectCntl14	(*((volatile unsigned long *) 0xFFFFF238))
+#define VICVectCntl15	(*((volatile unsigned long *) 0xFFFFF23C))
+
+/* Pin Function Select */
+#define PINSEL0		(*((volatile unsigned long *) 0xE002C000))
+#define PINSEL1		(*((volatile unsigned long *) 0xE002C004))
+
+/* Legacy General Purpose Input/Output (GPIO) */
+#define IOPIN		(*((volatile unsigned long *) 0xE0028000))
+#define IOSET		(*((volatile unsigned long *) 0xE0028004))
+#define IODIR		(*((volatile unsigned long *) 0xE0028008))
+#define IOCLR		(*((volatile unsigned long *) 0xE002800C))
+
+/* Fast General Purpose Input/Output (GPIO) */
+#define FIODIR		(*((volatile unsigned long *) 0x3FFFC000))
+#define FIOMASK		(*((volatile unsigned long *) 0x3FFFC010))
+#define FIOPIN		(*((volatile unsigned long *) 0x3FFFC014))
+#define FIOSET		(*((volatile unsigned long *) 0x3FFFC018))
+#define FIOCLR		(*((volatile unsigned long *) 0x3FFFC01C))
+
+#define RBR RBR_THR_DLL
+#define THR RBR_THR_DLL
+#define DLL RBR_THR_DLL
+#define IER IER_DLM
+#define DLM IER_DLM
+#define IIR IIR_FCR
+#define FCR IIR_FCR
+typedef struct
+{
+    LPC_REG8  RBR_THR_DLL; //0x00
+    LPC_REG8  IER_DLM;     //0x04
+    LPC_REG8  IIR_FCR;     //0x08
+    LPC_REG8  LCR;         //0x0c
+    LPC_REG8  MCR;         //0x10
+    LPC_REG8  LSR;         //0x14
+    LPC_REG8  MSR;         //0x18
+    LPC_REG8  SCR;         //0x1c
+    LPC_REG32 ACR;         //0x20
+    LPC_REG8  unused1;     //0x24
+    LPC_REG8  FDR;         //0x28
+    LPC_REG8  unused2;     //0x2c
+    LPC_REG8  TER;         //0x2c
+} lpc_uart;
+
+#define lpc_uart0   (*((lpc_uart *)0xE000C000))
+#define lpc_uart1   (*((lpc_uart *)0xE0010000))
+
+/* Universal Asynchronous Receiver/Transmitter 0 (UART0) */
+#define U0RBR		(*((volatile unsigned char *) 0xE000C000)) /* rx buffer reg. (R/O when DLAB=0) */
+#define U0THR		(*((volatile unsigned char *) 0xE000C000)) /* tx holding reg. (W/O when DLAB=0) */
+#define U0DLL		(*((volatile unsigned char *) 0xE000C000)) /* divisor latch LSB (R/W when DLAB=1) */
+#define U0DLM		(*((volatile unsigned char *) 0xE000C004)) /* divisor latch MSB (R/W when DLAB=1) */
+#define U0IER		(*((volatile unsigned char *) 0xE000C004)) /* interrupt enable reg. (R/W when DLAB=0) */
+#define U0IIR		(*((volatile unsigned char *) 0xE000C008)) /* interrupt ID reg. */
+#define U0FCR		(*((volatile unsigned char *) 0xE000C008)) /* FIFO control reg. */
+#define U0LCR		(*((volatile unsigned char *) 0xE000C00C)) /* line control reg. */
+#define U0LSR		(*((volatile unsigned char *) 0xE000C014)) /* line status reg. */
+#define U0SCR		(*((volatile unsigned char *) 0xE000C01C)) /* scratch pad reg. */
+#define U0ACR		(*((volatile unsigned long *) 0xE000C020)) /* auto-baud control reg. */
+#define U0FDR		(*((volatile unsigned char *) 0xE000C028)) /* fractional divider reg. */
+#define U0TER		(*((volatile unsigned char *) 0xE000C030)) /* tx enable reg. */
+
+/* Universal Asynchronous Receiver/Transmitter 1 (UART1) */
+#define U1RBR		(*((volatile unsigned char *) 0xE0010000)) /* rx buffer reg. (R/O when DLAB=0) */
+#define U1THR		(*((volatile unsigned char *) 0xE0010000)) /* tx holding reg. (W/O when DLAB=0) */
+#define U1DLL		(*((volatile unsigned char *) 0xE0010000)) /* divisor latch LSB (R/W when DLAB=1) */
+#define U1DLM		(*((volatile unsigned char *) 0xE0010004)) /* divisor latch MSB (R/W when DLAB=1) */
+#define U1IER		(*((volatile unsigned char *) 0xE0010004)) /* interrupt enable reg. (R/W when DLAB=0) */
+#define U1IIR		(*((volatile unsigned char *) 0xE0010008)) /* interrupt ID reg. */
+#define U1FCR		(*((volatile unsigned char *) 0xE0010008)) /* FIFO control reg. */
+#define U1LCR		(*((volatile unsigned char *) 0xE001000C)) /* line control reg. */
+#define U1MCR		(*((volatile unsigned char *) 0xE0010010)) /* modem control reg. */
+#define U1LSR		(*((volatile unsigned char *) 0xE0010014)) /* line status reg. */
+#define U1MSR		(*((volatile unsigned char *) 0xE0010018)) /* modem status reg. */
+#define U1SCR		(*((volatile unsigned char *) 0xE001001C)) /* scratch pad reg. */
+#define U1ACR		(*((volatile unsigned long *) 0xE0010020)) /* auto-baud control reg. */
+#define U1FDR		(*((volatile unsigned char *) 0xE0010028)) /* fractional divider reg. */
+#define U1TER		(*((volatile unsigned char *) 0xE0010030)) /* tx enable reg. */
+
+/* I2C Interface 0 */
+#define I2C0CONSET	(*((volatile unsigned char *) 0xE001C000)) /* control set reg. */
+#define I2C0STAT	(*((volatile unsigned char *) 0xE001C004)) /* status reg. */
+#define I2C0DAT		(*((volatile unsigned char *) 0xE001C008)) /* data reg. */
+#define I2C0ADR		(*((volatile unsigned char *) 0xE001C00C)) /* slave address reg. */
+#define I2C0SCLH	(*((volatile unsigned short*) 0xE001C010)) /* duty cycle reg. (MSW) */
+#define I2C0SCLL	(*((volatile unsigned short*) 0xE001C014)) /* duty cycle reg. (LSW) */
+#define I2C0CONCLR	(*((volatile unsigned char *) 0xE001C018)) /* control clear reg. W/O */
+
+/* I2C Interface 1 */
+#define I2C1CONSET	(*((volatile unsigned char *) 0xE005C000)) /* control set reg. */
+#define I2C1STAT	(*((volatile unsigned char *) 0xE005C004)) /* status reg. */
+#define I2C1DAT		(*((volatile unsigned char *) 0xE005C008)) /* data reg. */
+#define I2C1ADR		(*((volatile unsigned char *) 0xE005C00C)) /* slave address reg. */
+#define I2C1SCLH	(*((volatile unsigned short*) 0xE005C010)) /* duty cycle reg. (MSW) */
+#define I2C1SCLL	(*((volatile unsigned short*) 0xE005C014)) /* duty cycle reg. (LSW) */
+#define I2C1CONCLR	(*((volatile unsigned char *) 0xE005C018)) /* control clear reg. W/O */
+
+/* Serial Peripheral Interface (SPI) */
+#define S0SPCR		(*((volatile unsigned short*) 0xE0020000)) /* control reg. */
+#define S0SPSR		(*((volatile unsigned char *) 0xE0020004)) /* status reg. */
+#define S0SPDR		(*((volatile unsigned short*) 0xE0020008)) /* data reg. */
+#define S0SPCCR		(*((volatile unsigned char *) 0xE002000C)) /* clock counter reg. */
+#define S0SPINT		(*((volatile unsigned char *) 0xE002001C)) /* interrupt flag */
+
+/* Synchronous Serial Port (SSP) */
+
+#define SSPCR0		(*((volatile unsigned short*) 0xE0068000)) /* control reg. 0 */
+#define SSPCR1		(*((volatile unsigned char *) 0xE0068004)) /* control reg. 1 */
+#define SSPDR		(*((volatile unsigned short*) 0xE0068008)) /* data reg. */
+#define SSPSR		(*((volatile unsigned char *) 0xE006800C)) /* status reg. */
+#define SSPCPSR		(*((volatile unsigned char *) 0xE0068010)) /* clock prescale reg. */
+#define SSPIMSC		(*((volatile unsigned char *) 0xE0068014)) /* interrupt mask set and clear reg. */
+#define SSPRIS		(*((volatile unsigned char *) 0xE0068018)) /* raw interrupt status reg. */
+#define SSPMIS		(*((volatile unsigned char *) 0xE006801C)) /* masked interrupt status reg. */
+#define SSPICR		(*((volatile unsigned char *) 0xE0068020)) /* interrupt clear reg. */
+
+/* Memory Accelerator Module (MAM) */
+#define MAMCR		(*((volatile unsigned char *) 0xE01FC000)) /* MAM control reg. */
+#define MAMTIM		(*((volatile unsigned char *) 0xE01FC004)) /* MAM timing control */
+
+/* External Interrupts */
+#define EXTINT		(*((volatile unsigned char *) 0xE01FC140)) /* external interrupt flag reg. */
+#define INTWAKE		(*((volatile unsigned short*) 0xE01FC144)) /* interrupt wake-up reg. */
+#define EXTMODE		(*((volatile unsigned char *) 0xE01FC148)) /* external interrupt mode reg. */
+#define EXTPOLAR	(*((volatile unsigned char *) 0xE01FC14C)) /* external interrupt polarity reg. */
+
+/* Memory Mapping Control */
+#define MEMMAP		(*((volatile unsigned char *) 0xE01FC040)) /* memory mapping control */
+
+/* Phase Locked Loop (PLL) */
+#define PLLCON		(*((volatile unsigned char *) 0xE01FC080)) /* PLL control reg. (protected by PLLFEED) */
+#define PLLCFG		(*((volatile unsigned char *) 0xE01FC084)) /* PLL configuration reg. (protected by PLLFEED) */
+#define PLLSTAT		(*((volatile unsigned short*) 0xE01FC088)) /* PLL status reg. */
+#define PLLFEED		(*((volatile unsigned char *) 0xE01FC08C)) /* PLL feed reg */
+
+/* Power Control */
+#define PCON		(*((volatile unsigned char *) 0xE01FC0C0)) /* power control reg. */
+#define PCONP		(*((volatile unsigned long *) 0xE01FC0C4)) /* power control for peripherals */
+
+/* APB Divider */
+#define APBDIV		(*((volatile unsigned char *) 0xE01FC100)) /* APB divider control */
+
+/* Reset */
+#define RSIR		(*((volatile unsigned char *) 0xE01FC180)) /* reset source identification reg. */
+
+/* Code Security/Debugging */
+#define CSPR		(*((volatile unsigned char *) 0xE01FC184)) /* code security protection reg. (R/O) */
+
+/* System Control and Status flags register */
+#define SCS		(*((volatile unsigned long *) 0xE01FC1A0))
+
+/* RTC */
+#define RTC_CCR      (*((volatile unsigned char *) 0xE0024008)) /* clock control */
+#define RTC_CLKEN   BIT0
+#define RTC_CTCRST  BIT1
+#define RTC_CLKSRC  BIT4
+#define RTC_CLKSRC32KHZ  RTC_CLKSRC
+#define RTC_PREINT   (*((volatile unsigned short *) 0xE0024080)) /* prescaler (int) */
+#define RTC_PREFRAC  (*((volatile unsigned short *) 0xE0024084)) /* prescaler (fraction) */
+#define RTC_SEC      (*((volatile unsigned char  *) 0xE0024020))
+#define RTC_MIN      (*((volatile unsigned char  *) 0xE0024024))
+#define RTC_HOUR     (*((volatile unsigned char  *) 0xE0024028))
+#define RTC_DOM      (*((volatile unsigned char  *) 0xE002402C)) /* day of month */
+#define RTC_DAY RTC_DOM
+#define RTC_DOW      (*((volatile unsigned char  *) 0xE0024030))
+#define RTC_DOY      (*((volatile unsigned short *) 0xE0024034))
+#define RTC_MONTH    (*((volatile unsigned char  *) 0xE0024038))
+#define RTC_YEAR     (*((volatile unsigned short *) 0xE002403C))
+
+/* Timer 0 */
+#define T0IR		(*((volatile unsigned char *) 0xE0004000)) /* interrupt reg. */
+#define T0TCR		(*((volatile unsigned char *) 0xE0004004)) /* timer control reg. */
+#define T0TC		(*((volatile unsigned long *) 0xE0004008)) /* timer counter */
+#define T0PR		(*((volatile unsigned long *) 0xE000400C)) /* prescale reg. */
+#define T0PC		(*((volatile unsigned long *) 0xE0004010)) /* prescale counter */
+#define T0MCR		(*((volatile unsigned short*) 0xE0004014)) /* match control reg. */
+#define T0MR0		(*((volatile unsigned long *) 0xE0004018)) /* match reg. 0 */
+#define T0MR1		(*((volatile unsigned long *) 0xE000401C)) /* match reg. 1 */
+#define T0MR2		(*((volatile unsigned long *) 0xE0004020)) /* match reg. 2 */
+#define T0MR3		(*((volatile unsigned long *) 0xE0004024)) /* match reg. 3 */
+#define T0CCR		(*((volatile unsigned short*) 0xE0004028)) /* capture control reg. */
+#define T0CR0		(*((volatile unsigned long *) 0xE000402C)) /* capture reg. 0 */
+#define T0CR1		(*((volatile unsigned long *) 0xE0004030)) /* capture reg. 1 */
+#define T0CR2		(*((volatile unsigned long *) 0xE0004034)) /* capture reg. 2 */
+#define T0EMR		(*((volatile unsigned short*) 0xE000403C)) /* external match reg. */
+#define T0CTCR		(*((volatile unsigned char *) 0xE0004070)) /* count control reg. */
+#define T0PWMCON	(*((volatile unsigned long *) 0xE0004074)) /* PWM control reg. */
+
+/* Timer 1 */
+#define T1IR		(*((volatile unsigned char *) 0xE0008000)) /* interrupt reg. */
+#define T1TCR		(*((volatile unsigned char *) 0xE0008004)) /* timer control reg. */
+#define T1TC		(*((volatile unsigned long *) 0xE0008008)) /* timer counter */
+#define T1PR		(*((volatile unsigned long *) 0xE000800C)) /* prescale reg. */
+#define T1PC		(*((volatile unsigned long *) 0xE0008010)) /* prescale counter */
+#define T1MCR		(*((volatile unsigned short*) 0xE0008014)) /* match control reg. */
+#define T1MR0		(*((volatile unsigned long *) 0xE0008018)) /* match reg. 0 */
+#define T1MR1		(*((volatile unsigned long *) 0xE000801C)) /* match reg. 1 */
+#define T1MR2		(*((volatile unsigned long *) 0xE0008020)) /* match reg. 2 */
+#define T1MR3		(*((volatile unsigned long *) 0xE0008024)) /* match reg. 3 */
+#define T1CCR		(*((volatile unsigned short*) 0xE0008028)) /* capture control reg. */
+#define T1CR0		(*((volatile unsigned long *) 0xE000802C)) /* capture reg. 0 */
+#define T1CR1		(*((volatile unsigned long *) 0xE0008030)) /* capture reg. 1 */
+#define T1CR2		(*((volatile unsigned long *) 0xE0008034)) /* capture reg. 2 */
+#define T1EMR		(*((volatile unsigned short*) 0xE000803C)) /* external match reg. */
+#define T1CTCR		(*((volatile unsigned char *) 0xE0008070)) /* count control reg. */
+#define T1PWMCON	(*((volatile unsigned long *) 0xE0008074)) /* PWM control reg. */
+
+/* Timer 2 */
+#define T2IR		(*((volatile unsigned char *) 0xE0070000)) /* interrupt reg. */
+#define T2TCR		(*((volatile unsigned char *) 0xE0070004)) /* timer control reg. */
+#define T2TC		(*((volatile unsigned short*) 0xE0070008)) /* timer counter */
+#define T2PR		(*((volatile unsigned short*) 0xE007000C)) /* prescale reg. */
+#define T2PC		(*((volatile unsigned short*) 0xE0070010)) /* prescale counter */
+#define T2MCR		(*((volatile unsigned short*) 0xE0070014)) /* match control reg. */
+#define T2MR0		(*((volatile unsigned short*) 0xE0070018)) /* match reg. 0 */
+#define T2MR1		(*((volatile unsigned short*) 0xE007001C)) /* match reg. 1 */
+#define T2MR2		(*((volatile unsigned short*) 0xE0070020)) /* match reg. 2 */
+#define T2MR3		(*((volatile unsigned short*) 0xE0070024)) /* match reg. 3 */
+#define T2MR0L		(*((volatile unsigned long*) 0xE0070018)) /* match reg. 0 */
+#define T2MR1L		(*((volatile unsigned long*) 0xE007001C)) /* match reg. 1 */
+#define T2MR2L		(*((volatile unsigned long*) 0xE0070020)) /* match reg. 2 */
+#define T2MR3L		(*((volatile unsigned long*) 0xE0070024)) /* match reg. 3 */
+#define T2CCR		(*((volatile unsigned short*) 0xE0070028)) /* capture control reg. */
+#define T2CR0		(*((volatile unsigned short*) 0xE007002C)) /* capture reg. 0 */
+#define T2CR1		(*((volatile unsigned short*) 0xE0070030)) /* capture reg. 1 */
+#define T2CR2		(*((volatile unsigned short*) 0xE0070034)) /* capture reg. 2 */
+#define T2EMR		(*((volatile unsigned short*) 0xE007003C)) /* external match reg. */
+#define T2CTCR		(*((volatile unsigned char *) 0xE0070070)) /* count control reg. */
+#define T2PWMCON	(*((volatile unsigned long *) 0xE0070074)) /* PWM control reg. */
+
+/* Timer 3 */
+#define T3IR		(*((volatile unsigned char *) 0xE0074000)) /* interrupt reg. */
+#define T3TCR		(*((volatile unsigned char *) 0xE0074004)) /* timer control reg. */
+#define T3TC		(*((volatile unsigned short*) 0xE0074008)) /* timer counter */
+#define T3PR		(*((volatile unsigned short*) 0xE007400C)) /* prescale reg. */
+#define T3PC		(*((volatile unsigned short*) 0xE0074010)) /* prescale counter */
+#define T3MCR		(*((volatile unsigned short*) 0xE0074014)) /* match control reg. */
+#define T3MR0		(*((volatile unsigned short*) 0xE0074018)) /* match reg. 0 */
+#define T3MR1		(*((volatile unsigned short*) 0xE007401C)) /* match reg. 1 */
+#define T3MR2		(*((volatile unsigned short*) 0xE0074020)) /* match reg. 2 */
+#define T3MR3		(*((volatile unsigned short*) 0xE0074024)) /* match reg. 3 */
+#define T3MR0L		(*((volatile unsigned long*) 0xE0074018)) /* match reg. 0 */
+#define T3MR1L		(*((volatile unsigned long*) 0xE007401C)) /* match reg. 1 */
+#define T3MR2L		(*((volatile unsigned long*) 0xE0074020)) /* match reg. 2 */
+#define T3MR3L		(*((volatile unsigned long*) 0xE0074024)) /* match reg. 3 */
+#define T3CCR		(*((volatile unsigned short*) 0xE0074028)) /* capture control reg. */
+#define T3CR0		(*((volatile unsigned short*) 0xE007402C)) /* capture reg. 0 */
+#define T3CR1		(*((volatile unsigned short*) 0xE0074030)) /* capture reg. 1 */
+#define T3CR2		(*((volatile unsigned short*) 0xE0074034)) /* capture reg. 2 */
+#define T3EMR		(*((volatile unsigned short*) 0xE007403C)) /* external match reg. */
+#define T3CTCR		(*((volatile unsigned char *) 0xE0074070)) /* count control reg. */
+#define T3PWMCON	(*((volatile unsigned long *) 0xE0074074)) /* PWM control reg. */
+
+/* ADC0 */
+#define AD0CR       (*((volatile unsigned long *) 0xE0034000)) /* ADC control reg. */
+#define AD0GDR      (*((volatile unsigned long *) 0xE0034004)) /* ADC global data reg. */
+#define AD0STAT     (*((volatile unsigned long *) 0xE0034030)) /* ADC status reg. */
+#define AD0INTEN    (*((volatile unsigned long *) 0xE003400C)) /* ADC irq en reg. */
+#define AD0DR0      (*((volatile unsigned long *) 0xE0034010)) /* ADC data reg. 0 */
+#define AD0DR1      (*((volatile unsigned long *) 0xE0034014)) /* ADC data reg. 1 */
+#define AD0DR2      (*((volatile unsigned long *) 0xE0034018)) /* ADC data reg. 2 */
+#define AD0DR3      (*((volatile unsigned long *) 0xE003401C)) /* ADC data reg. 3 */
+#define AD0DR4      (*((volatile unsigned long *) 0xE0034020)) /* ADC data reg. 4 */
+#define AD0DR5      (*((volatile unsigned long *) 0xE0034024)) /* ADC data reg. 5 */
+#define AD0DR6      (*((volatile unsigned long *) 0xE0034028)) /* ADC data reg. 6 */
+#define AD0DR7      (*((volatile unsigned long *) 0xE003402C)) /* ADC data reg. 7 */
+
+
+/* Bit definitions */
+
+/* Timer 01 */
+#define Tx_cnt_enable BIT0
+#define Tx_reset  BIT1
+
+#define Tx_mode_timer 0
+#define Tx_mode_cnt_rising BIT0
+#define Tx_mode_cnt_falling BIT1
+#define Tx_mode_cnt_both (BIT0|BIT1)
+
+#define MR0int      BIT0
+#define MR0reset    BIT1
+#define MR0stop     BIT2
+#define MR1int      BIT3
+#define MR1reset    BIT4
+#define MR1stop     BIT5
+#define MR2int      BIT6
+#define MR2reset    BIT7
+#define MR2stop     BIT8
+#define MR3int      BIT9
+#define MR3reset    BIT10
+#define MR3stop     BIT11
+
+#define capre(x)    (BIT0 << ((x)*3))
+#define capfe(x)    (BIT1 << ((x)*3))
+#define capi(x)     (BIT2 << ((x)*3))
+#define cap0re      BIT0
+#define cap0fe      BIT1
+#define cap0i       BIT2
+#define cap1re      BIT3
+#define cap1fe      BIT4
+#define cap1i       BIT5
+#define cap2re      BIT6
+#define cap2fe      BIT7
+#define cap2i       BIT8
+#define cap3re      BIT9
+#define cap3fe      BIT10
+#define cap3i       BIT11
+
+#define INT_MR0 BIT0
+#define INT_MR1 BIT1
+#define INT_MR2 BIT2
+#define INT_MR3 BIT3
+#define INT_CR0 BIT4
+#define INT_CR1 BIT5
+#define INT_CR2 BIT6
+#define INT_CR3 BIT7
+
+/* Interrupt enables */
+#define IE_Timer3 27
+#define IE_Timer2 26
+#define IE_I2C1   19
+#define IE_AD0    18
+#define IE_EINT2  16
+#define IE_EINT1  15
+#define IE_EINT0  14
+#define IE_RTC    13
+#define IE_PLL    12
+#define IE_SPI1   11
+#define IE_SPI0   10
+#define IE_I2C0   9
+#define IE_UART1  7
+#define IE_UART0  6
+#define IE_Timer1 5
+#define IE_Timer0 4
+#define IE_ARMCORE1 3
+#define IE_ARMCORE0 2
+#define IE_WDT    0
+#define BIT(x) (1<<x)
+#define IRQ_EN    BIT5
+#define IRQ_DIS   0
+
+//GPIO
+#define GPIO0M BIT0
+
+//APBDIV
+#define APBDIV1 BIT0
+#define APBDIV2 BIT1
+#define APBDIV4 0
+
+//PLL
+#define PSEL_BIT0 		BIT5
+#define PSEL_BIT1 		BIT6
+
+#define PSEL1   0
+#define PSEL2   PSEL_BIT0
+#define PSEL4   PSEL_BIT1
+#define PSEL8   (PSEL_BIT0|PSEL_BIT1)
+
+#define PLLE		BIT0
+#define PLLC		BIT1
+#define PLOCK		BIT10
+#define PLL_FEED1	0xAA
+#define PLL_FEED2	0x55
+
+/* SCB */
+#define MEMMAP_BOOT_LOADER_MODE   0       // Interrupt vectors are re-mapped to Boot Block.
+#define MEMMAP_USER_FLASH_MODE    BIT0  // Interrupt vectors are not re-mapped and reside in Flash.
+#define MEMMAP_USER_RAM_MODE      BIT1  // Interrupt vectors are re-mapped to Static RAM.
+
+
+/* UART */
+#define FIFO_ENABLE   		BIT0
+#define FIFO_RX_CLEAR       BIT1
+#define FIFO_TX_CLEAR       BIT2
+#define FIFO_RX_TRIGGER_1   0
+#define FIFO_RX_TRIGGER_4   BIT6
+#define FIFO_RX_TRIGGER_8   BIT7
+#define FIFO_RX_TRIGGER_14  (BIT6|BIT7)
+
+#define UART_5BIT           0
+#define UART_6BIT           1
+#define UART_7BIT           2
+#define UART_8BIT           3
+#define STOPBIT             BIT2
+#define PARITY              BIT3
+#define PARITY_ODD          0
+#define PARITY_EVEN         BIT4
+#define PARITY_1            BIT5
+#define PARITY_0            (BIT4|BIT5)
+#define BREAK				BIT6
+#define DLAB				BIT7
+
+#define TXEN				BIT7
+
+#define RDR                 BIT0
+#define OVERRUN             BIT1
+#define PARITY_ERROR        BIT2
+#define FRAMING_ERROR       BIT3
+#define BREAK_IRQ			BIT4
+#define THRE				BIT5
+#define TEMT				BIT6
+#define RXFE				BIT7
+
+#define AUTOBAUD_START      BIT0
+#define AUTOBAUD_MODE       BIT1
+#define AUTOBAUD_RESTART    BIT2
+#define AUTOBAUD_END_IRQ    BIT8
+#define AUTOBAUD_TIMEOUT_IRQ BIT9
+
+#define IRQ_data_ready        BIT0
+#define IRQ_transmitter_ready BIT1
+#define IRQ_status_line       BIT2
+#define IRQ_autobaud_timeout  BIT8
+#define IRQ_autobaud_end      BIT9
+
+#define power_timer0    BIT1
+#define power_timer1    BIT2
+#define power_uart0     BIT3
+#define power_uart1     BIT4
+#define power_i2c0      BIT7
+#define power_spi       BIT8
+#define power_rtc       BIT9
+#define power_ssp       BIT10
+#define power_adc       BIT12
+#define power_i2c1      BIT19
+#define power_timer2    BIT28
+#define power_timer3    BIT29
+
+#if 1
+#define force_inline __attribute__((always_inline))
+#define const_func __attribute__((const))
+#define pure_func __attribute__((pure))
+#define naked_func __attribute__((naked))
+#else 
+#define force_inline
+#define const_func
+#define pure_func
 #endif
-#define     __O     volatile             /*!< defines 'write only' permissions                */
-#define     __IO    volatile             /*!< defines 'read / write' permissions              */
 
-/*------------- Real-Time Clock (RTC) ----------------------------------------*/
-typedef struct
-{
-  __IO uint8_t  ILR;
-       uint8_t  RESERVED0[7];
-  __IO uint8_t  CCR;
-       uint8_t  RESERVED1[3];
-  __IO uint8_t  CIIR;
-       uint8_t  RESERVED2[3];
-  __IO uint8_t  AMR;
-       uint8_t  RESERVED3[3];
-  __I  uint32_t CTIME0;
-  __I  uint32_t CTIME1;
-  __I  uint32_t CTIME2;
-  __IO uint8_t  SEC;
-       uint8_t  RESERVED4[3];
-  __IO uint8_t  MIN;
-       uint8_t  RESERVED5[3];
-  __IO uint8_t  HOUR;
-       uint8_t  RESERVED6[3];
-  __IO uint8_t  DOM;
-       uint8_t  RESERVED7[3];
-  __IO uint8_t  DOW;
-       uint8_t  RESERVED8[3];
-  __IO uint16_t DOY;
-       uint16_t RESERVED9;
-  __IO uint8_t  MONTH;
-       uint8_t  RESERVED10[3];
-  __IO uint16_t YEAR;
-       uint16_t RESERVED11;
-  __IO uint32_t CALIBRATION;
-  __IO uint32_t GPREG0;
-  __IO uint32_t GPREG1;
-  __IO uint32_t GPREG2;
-  __IO uint32_t GPREG3;
-  __IO uint32_t GPREG4;
-  __IO uint8_t  AUXEN;
-       uint8_t  RESERVED12[3];
-  __IO uint8_t  AUX;
-       uint8_t  RESERVED13[3];
-  __IO uint8_t  ALSEC;
-       uint8_t  RESERVED14[3];
-  __IO uint8_t  ALMIN;
-       uint8_t  RESERVED15[3];
-  __IO uint8_t  ALHOUR;
-       uint8_t  RESERVED16[3];
-  __IO uint8_t  ALDOM;
-       uint8_t  RESERVED17[3];
-  __IO uint8_t  ALDOW;
-       uint8_t  RESERVED18[3];
-  __IO uint16_t ALDOY;
-       uint16_t RESERVED19;
-  __IO uint8_t  ALMON;
-       uint8_t  RESERVED20[3];
-  __IO uint16_t ALYEAR;
-       uint16_t RESERVED21;
-  __IO uint32_t PREINT;
-  __IO uint32_t PREFRAC;
-       
-} LPC_RTC_TypeDef;
+#define SPI0_BitEnable  BIT2
+#define SPI0_CPAH       BIT3
+#define SPI0_CPOL       BIT4
+#define SPI0_Master     BIT5
+#define SPI0_LSBF       BIT6
+#define SPI0_SPIE       BIT7
+#define SPI0_BITS_8     BIT11
+#define SPI0_BITS_9     (BIT11|BIT8)
+#define SPI0_BITS_10    (BIT11|BIT9)
+#define SPI0_BITS_11    (BIT11|BIT9|BIT8)
+#define SPI0_BITS_12    (BIT11|BIT10)
+#define SPI0_BITS_13    (BIT11|BIT10|BIT8)
+#define SPI0_BITS_14    (BIT11|BIT10|BIT9)
+#define SPI0_BITS_15    (BIT11|BIT10|BIT9|BIT8)
+#define SPI0_BITS_16    0
 
-/*------------- Timer (TIM) --------------------------------------------------*/
-typedef struct
-{
-  __IO uint32_t IR;
-  __IO uint32_t TCR;
-  __IO uint32_t TC;
-  __IO uint32_t PR;
-  __IO uint32_t PC;
-  __IO uint32_t MCR;
-  __IO uint32_t MR[4];
-  __IO uint32_t CCR;
-  __I  uint32_t CR[4];
-  __IO uint32_t EMR;
-       uint32_t RESERVED1[12];
-  __IO uint32_t CTCR;
-} LPC_TIM_TypeDef;
-
-/*------------- Universal Asynchronous Receiver Transmitter (UART) -----------*/
-typedef struct
-{
-  union {
-  __I  uint8_t  RBR;
-  __O  uint8_t  THR;
-  __IO uint8_t  DLL;
-       uint32_t RESERVED0;
-  };
-  union {
-  __IO uint8_t  DLM;
-  __IO uint32_t IER;
-  };
-  union {
-  __I  uint32_t IIR;
-  __O  uint8_t  FCR;
-  };
-  __IO uint8_t  LCR;
-       uint8_t  RESERVED1[7];
-  __I  uint8_t  LSR;
-       uint8_t  RESERVED2[7];
-  __IO uint8_t  SCR;
-       uint8_t  RESERVED3[3];
-  __IO uint32_t ACR;
-  __IO uint8_t  ICR;
-       uint8_t  RESERVED4[3];
-  __IO uint8_t  FDR;
-       uint8_t  RESERVED5[7];
-  __IO uint8_t  TER;
-       uint8_t  RESERVED6[39];
-  __IO uint32_t FIFOLVL;
-} LPC_UART_TypeDef;
-
-/*------------- General Purpose Input/Output (GPIO) --------------------------*/
-
-typedef struct
-{
-  union {
-    __IO uint32_t DIR;
-    struct {
-      __IO uint16_t DIRL;
-      __IO uint16_t DIRH;
-    };
-    struct {
-      __IO uint8_t DIR0;
-      __IO uint8_t DIR1;
-      __IO uint8_t DIR2;
-      __IO uint8_t DIR3;
-    };
-  };
-  uint32_t RESERVED0[3];
-  union {
-    __IO uint32_t MASK;
-    struct {
-      __IO uint16_t MASKL;
-      __IO uint16_t MASKH;
-    };
-    struct {
-      __IO uint8_t MASK0;
-      __IO uint8_t MASK1;
-      __IO uint8_t MASK2;
-      __IO uint8_t MASK3;
-    };
-  };
-  union {
-    __IO uint32_t PIN;
-    struct {
-      __IO uint16_t PINL;
-      __IO uint16_t PINH;
-    };
-    struct {
-      __IO uint8_t PIN0;
-      __IO uint8_t PIN1;
-      __IO uint8_t PIN2;
-      __IO uint8_t PIN3;
-    };
-  };
-  union {
-    __IO uint32_t SET;
-    struct {
-      __IO uint16_t SETL;
-      __IO uint16_t SETH;
-    };
-    struct {
-      __IO uint8_t SET0;
-      __IO uint8_t SET1;
-      __IO uint8_t SET2;
-      __IO uint8_t SET3;
-    };
-  };
-  union {
-    __O  uint32_t CLR;
-    struct {
-      __O  uint16_t CLRL;
-      __O  uint16_t CLRH;
-    };
-    struct {
-      __O  uint8_t CLR0;
-      __O  uint8_t CLR1;
-      __O  uint8_t CLR2;
-      __O  uint8_t CLR3;
-    };
-  };
-} LPC_GPIO_TypeDef;
-
-/*------------- Analog-to-Digital Converter (ADC) ----------------------------*/
-typedef struct {                            /*!< (@ 0x400Ex000) ADCn Structure         */
-  __IO uint32_t CR;                         /*!< (@ 0x400Ex000) A/D Control Register. The AD0CR register must be written to select the operating mode before A/D conversion can occur. */
-  __I  uint32_t GDR;                        /*!< (@ 0x400Ex004) A/D Global Data Register. Contains the result of the most recent A/D conversion. */
-  __I  uint32_t RESERVED0[1];
-  __IO uint32_t INTEN;                      /*!< (@ 0x400Ex00C) A/D Interrupt Enable Register. This register contains enable bits that allow the DONE flag of each A/D channel to be included or excluded from contributing to the generation of an A/D interrupt. */
-  __I  uint32_t DR[8];                      /*!< (@ 0x400Ex010) A/D Channel Data Register. This register contains the result of the most recent conversion completed on channel n. */
-  __I  uint32_t STAT;                       /*!< (@ 0x400Ex030) A/D Status Register. This register contains DONE and OVERRUN flags for all of the A/D channels, as well as the A/D interrupt flag. */
-} LPC_ADC_TypeDef;
-
-
-/*------------- Watchdog Timer (WDT) -----------------------------------------*/
-typedef struct
-{
-  __IO uint8_t  WDMOD;
-       uint8_t  RESERVED0[3];
-  __IO uint32_t WDTC;
-  __O  uint8_t  WDFEED;
-       uint8_t  RESERVED1[3];
-  __I  uint32_t WDTV;
-} LPC_WDT_TypeDef;
-
-/*------------- Pulse-Width Modulation (PWM) ---------------------------------*/
-typedef struct
-{
-  __IO uint32_t IR;	
-  __IO uint32_t TCR;
-  __IO uint32_t TC;	
-  __IO uint32_t PR;	
-  __IO uint32_t PC;	
-  __IO uint32_t MCR;
-  __IO uint32_t MR0;
-  __IO uint32_t MR1;
-  __IO uint32_t MR2;
-  __IO uint32_t MR3;
-  __IO uint32_t CCR;
-  __I  uint32_t CR0;
-  __I  uint32_t CR1;
-  __I  uint32_t CR2;
-  __I  uint32_t CR3;
-       uint32_t RESERVED0;//we have this as	PWM_EMR but I don't find it in the pdf. mar
-  __IO uint32_t MR4;
-  __IO uint32_t MR5;
-  __IO uint32_t MR6;
-  __IO uint32_t PCR;
-  __IO uint32_t LER;
-       uint32_t RESERVED1[7];
-  //__IO uint32_t CTCR;	 //this does not seem to be a member in the LPC21xx. mar
-} LPC_PWM_TypeDef;
-
-#endif  //GCC_ASM_STEP
-
-
-#define LPC_UART0_BASE       	0xE000C000
-#define LPC_UART1_BASE       	0xE0010000
-
-#define LPC_TIM0_BASE           0xE0004000
-#define LPC_TIM1_BASE           0xE0008000
-#define LPC_TIM2_BASE           0xE0070000
-#define LPC_TIM3_BASE           0xE0074000
-
-#define LPC_RTC_BASE           	0xE0024000
-
-#define LPC_GPIO0_BASE         	0x3FFFC000
-#define LPC_GPIO1_BASE         	0x3FFFC020
-
-#define LPC_ADC_BASE         	0xE0034000
-#define LPC_WDT_BASE         	0xE0000000
-#define LPC_PWM1_BASE         	0xE0014000
-
-
-#define LPC_ADC               ((LPC_ADC_TypeDef       *) LPC_ADC_BASE      )
-#define LPC_WDT               ((LPC_WDT_TypeDef       *) LPC_WDT_BASE      )
-#define LPC_PWM1              ((LPC_PWM_TypeDef       *) LPC_PWM1_BASE     )
-
-#define LPC_TIM0              ((LPC_TIM_TypeDef       *) LPC_TIM0_BASE     )
-#define LPC_TIM1              ((LPC_TIM_TypeDef       *) LPC_TIM1_BASE     )
-#define LPC_TIM2              ((LPC_TIM_TypeDef       *) LPC_TIM2_BASE     )
-#define LPC_TIM3              ((LPC_TIM_TypeDef       *) LPC_TIM3_BASE     )
-#define LPC_UART0             ((LPC_UART_TypeDef      *) LPC_UART0_BASE    )
-#define LPC_UART1             ((LPC_UART_TypeDef      *) LPC_UART1_BASE    )
-
-#define LPC_RTC               ((LPC_RTC_TypeDef       *) LPC_RTC_BASE      )
-
-#define LPC_GPIO0             ((LPC_GPIO_TypeDef      *) LPC_GPIO0_BASE    )
-
-#endif /* lpc21xx_h */
-
+#define SPIF BIT7
+#endif // __LPC2103_H

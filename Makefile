@@ -12,13 +12,16 @@ install : main.hex
 startup.o : startup.s
 	$(ARMGNU)-as $(AOPS) startup.s -o startup.o
 
-main.hex : linker.ld startup.o uart.o main.o isr.o
-	$(ARMGNU)-ld -T linker.ld startup.o main.o uart.o isr.o -o main.elf
+main.hex : linker.ld startup.o uart.o timer.o main.o isr.o
+	$(ARMGNU)-ld -T linker.ld startup.o main.o timer.o uart.o isr.o -o main.elf
 	$(ARMGNU)-objdump -D main.elf > main.list
 	$(ARMGNU)-objcopy main.elf main.hex -O ihex
 
 isr.o : isr.c
 	$(ARMGNU)-gcc $(COPS) -c isr.c -o isr.o
+
+timer.o : timer.c
+	$(ARMGNU)-gcc $(COPS) -c timer.c -o timer.o
 
 uart.o : uart.c
 	$(ARMGNU)-gcc $(COPS) -c uart.c -o uart.o

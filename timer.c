@@ -18,5 +18,3 @@ void timer0ISR(void) {
 	T0IR = 0x1;
 	VICVectAddr = 0;
 }
-
-

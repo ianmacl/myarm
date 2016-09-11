@@ -1,6 +1,7 @@
 #include "lpc2103.h"
 #include "uart.h"
 #include "isr.h"
+#include "timer.h"
 
 #define LEDBIT  15
 
@@ -19,38 +20,41 @@ void enable_uart_interrupts(void) {
 	VICIntEnable = 1 << VIC_UART0;    // UART0 interrupt enabled
 	VICVectCntl1 = VIC_ENABLE | VIC_UART0;
 	VICVectAddr1 = (unsigned long) uart0ISR;    // address of the ISR
-	UART0_IER = 0x05;	// enable RBR interrupt 
+	U0IER = 0x05;	// enable RBR interrupt 
 
 }
 
 
 void pll_init(void) {
-  // P 2 M  3 FCCO 240000000 CCLK  60000000
-  // PUT32(PLLCFG, ((2 - 1) << 5) | ((3 - 1) << 0));
-  SCB_PLLCFG = 0x42;
-  SCB_PLLCON = 0x01;
-  SCB_PLLFEED = 0xAA;
-  SCB_PLLFEED = 0x55;
-  while ((SCB_PLLSTAT & (1 << 10)) == 0)
-    continue;
-  SCB_PLLCON = 0x03;
-  SCB_PLLFEED = 0xAA;
-  SCB_PLLFEED = 0x55;
-  MAM_CR = 0x00;
-  MAM_TIM = 0x03;
-  MAM_CR = 0x01; 
+  /** PLL Calculations:
+    PLLCFG 0x42 -> MSEL = 0x00010 (2 - Mult by 3), PSEL = 0x10 (2 - Divide by 4)
+    PCLK runs at 60 MHZ
+  */ 
+  PLLCFG = 0x42;
+  PLLCON = 0x01;
+  PLLFEED = 0xAA;
+  PLLFEED = 0x55;
+  while ((PLLSTAT & (1 << 10)) == 0);
+  PLLCON = 0x03;
+  PLLFEED = 0xAA;
+  PLLFEED = 0x55;
+  MAMCR = 0x00;
+  MAMTIM = 0x03;
+  MAMCR = 0x01; 
 }
 
 void main(void) {
-  SCB_SCS = 0x01;
+  SCS = 0x01;
   pll_init();
-  SCB_APBDIV = 0x01;
+  APBDIV = 0x01;
   uart_init();
   enable_uart_interrupts();
-  //initTimer0(0x01C9C380); // IRQ0 1sec; 1msec=0x7530
+  initTimer0(0x11e1a300); // IRQ0 1sec; 1msec=0x7530
+
+  while (T0PC < 0x6e1a300);
 
   enableIRQ();
-  GPIO0_IODIR = 1<<15;
+  IODIR = 1<<15;
   puts("Welcome to my awesome program");
   while (1) {
 
